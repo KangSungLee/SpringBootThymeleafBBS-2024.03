@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.example.abbs.entity.User;
 import com.example.abbs.service.UserService;
+import com.example.abbs.util.AsideUtil;
 import com.example.abbs.util.ImageUtil;
 
 import jakarta.servlet.http.HttpSession;
@@ -26,6 +27,7 @@ public class UserController {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	@Autowired private UserService uSvc;
 	@Autowired private ImageUtil imageUtil;
+	@Autowired private AsideUtil asideUtil;
 	@Value("${spring.servlet.multipart.location}") private String uploadDir;
 	
 	@GetMapping("/register")
@@ -86,7 +88,10 @@ public class UserController {
 			session.setAttribute("github", user.getGithub());
 			session.setAttribute("insta", user.getInsta());
 			session.setAttribute("location", user.getLocation());
-			
+			// 상태 메세지
+			String quoteFile = uploadDir + "data/todayQuote.txt";
+			String stateMsg = asideUtil.getTodayQuote(quoteFile);
+			session.setAttribute("stateMsg", stateMsg);
 			// 환영 메세지
 			log.info("Info Login: {}, {}", uid, user.getUname());
 			model.addAttribute("msg", user.getUname() + "님 환영합니다.");
