@@ -104,4 +104,11 @@ public class UserController {
 		}
 		return "common/alertMsg";
 	}
+	
+	@GetMapping("/logout")
+	public String logout(HttpSession session) {
+		session.invalidate();
+		return "redirect:/user/login";
+	}
+	
 }

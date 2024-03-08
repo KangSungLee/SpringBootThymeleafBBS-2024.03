@@ -54,7 +54,12 @@
 		<div class="row">
 			<div class="col-3">
 				<aside th:fragment="aside">
-					<img src="https://picsum.photos/256/256" class="rounded-circle" width="90%">
+					<div th:if="${session.profile}">
+						<img th:src="@{/file/profile/{x}(x=${session.profile})}" class="rounded-circle" width="90%">
+					</div>
+					<div th:unless="${session.profile}"th:un>
+						<img src="/abbs/img/person.png" class="rounded-circle" width="90%">
+					</div>
 					<div class="mt-2">
 						오늘의 명언을 이 자리에 적습니다.
 						<a href="#"><span class="badge bg-secondary">수정</span></a>
