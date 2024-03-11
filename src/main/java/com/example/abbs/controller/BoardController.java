@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.abbs.entity.Board;
 import com.example.abbs.entity.User;
@@ -28,7 +28,6 @@ import jakarta.servlet.http.HttpSession;
 public class BoardController {
 	@Autowired private BoardService boardService;
 	@Autowired private ImageUtil imageUtil;
-	@Autowired private ResourceLoader resourceLoader;
 	@Value("${spring.servlet.multipart.location}") private String uploadDir;
 
 	@GetMapping("/list")
@@ -65,19 +64,21 @@ public class BoardController {
 	
 	@PostMapping("/insert")
 	public String insertProc(MultipartHttpServletRequest req, Model model,
-			String bid, String content, HttpSession session) {
+			String uid, String title, String content) {
 		String filename = null;
 		MultipartFile filePart = req.getFile("profile");
 		if (filePart.getContentType().contains("image")) {	// 파일이 들어와있는 모양(들어와 있다면)
 			filename = filePart.getOriginalFilename();
-			String path = uploadDir + "profile/" + filename;
+			String path = uploadDir + "files/" + filename;
 			try {
 				filePart.transferTo(new File(path));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			filename = imageUtil.squareImage(bid, filename);
-			User user = new User(bid, content, session.getId("sessUid"));
-			boardService.registerUser(user);
+			filename = imageUtil.squareImage(uid, filename);
+		}
+		Board board = new Board(title, content, uid, filename);
+		boardService.insertBoard(board);
+		return "redirect:/board/list";
 	}
 }
