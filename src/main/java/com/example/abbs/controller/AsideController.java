@@ -17,4 +17,6 @@ public class AsideController {
 		session.setAttribute("stateMsg", stateMsg);
 		return "1";
 	}
+	
+	
 }
