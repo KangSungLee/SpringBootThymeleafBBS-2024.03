@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +16,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.abbs.entity.Board;
-import com.example.abbs.entity.User;
 import com.example.abbs.service.BoardService;
 import com.example.abbs.util.ImageUtil;
+import com.example.abbs.util.JsonUtil;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -27,7 +26,7 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/board")
 public class BoardController {
 	@Autowired private BoardService boardService;
-	@Autowired private ImageUtil imageUtil;
+	@Autowired private JsonUtil jsonUtil;
 	@Value("${spring.servlet.multipart.location}") private String uploadDir;
 
 	@GetMapping("/list")
@@ -58,26 +57,35 @@ public class BoardController {
 	}
 	
 	@GetMapping("/insert")
-	public String  insertForm() {
+	public String insertForm() {
 		return "board/insert";
 	}
 	
 	@PostMapping("/insert")
-	public String insertProc(MultipartHttpServletRequest req, Model model,
-			String uid, String title, String content) {
-		String filename = null;
-		MultipartFile filePart = req.getFile("profile");
-		if (filePart.getContentType().contains("image")) {	// 파일이 들어와있는 모양(들어와 있다면)
-			filename = filePart.getOriginalFilename();
-			String path = uploadDir + "files/" + filename;
+	public String insertProc(MultipartHttpServletRequest req, String title, String content, 
+			HttpSession session) {
+		String sessUid = (String) session.getAttribute("sessUid");
+		List<MultipartFile> uploadFIlList = req.getFiles("files");	// 여러개의 파일경우 사용
+		
+		List<String> fileList = new ArrayList<>();
+		for (MultipartFile part: uploadFIlList) {
+			// 첨부 파일이 없는 경우 - application/octet-stream
+			if (part.getContentType().contains("octet-stream")) {
+				continue;
+			}
+			// 첨부 파일이 있는 경우
+			String filename = part.getOriginalFilename();
+			String uploadPath = uploadDir + "upload/" + filename;
 			try {
-				filePart.transferTo(new File(path));
+				part.transferTo(new File(uploadPath));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			filename = imageUtil.squareImage(uid, filename);
+			fileList.add(filename);
 		}
-		Board board = new Board(title, content, uid, filename);
+		String files =jsonUtil.list2Json(fileList);
+		
+		Board board = new Board(title, content, sessUid, files);
 		boardService.insertBoard(board);
 		return "redirect:/board/list";
 	}
