@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.abbs.entity.Board;
+import com.example.abbs.entity.Reply;
 import com.example.abbs.service.BoardService;
 import com.example.abbs.util.ImageUtil;
 import com.example.abbs.util.JsonUtil;
@@ -89,4 +91,28 @@ public class BoardController {
 		boardService.insertBoard(board);
 		return "redirect:/board/list";
 	}
+	
+	@GetMapping("/detail/{bid}/{uid}")
+	public String detail(@PathVariable int bid, @PathVariable String uid, String option,
+			HttpSession session, Model model) {
+		// 본인이 조회한 경우 조회수 증가시키지 않음
+		String sessUid = (String) session.getAttribute("sessUid");
+		if(!uid.equals(sessUid)) {
+			boardService.increaseViewCount(bid);
+		} 
+		// 보드값 만들기
+		Board board = boardService.getBoard(bid);
+		String jsonFiles = board.getFiles();
+		if (!(jsonFiles == null || jsonFiles.equals(""))) {
+			/// 파일리스트로 만들어서 보내기
+			List<String> fileList = jsonUtil.json2List(jsonFiles);
+			model.addAttribute("fileList", fileList);
+		}
+		model.addAttribute("board", board);
+		
+		List<Reply> replyList = null;
+		model.addAttribute("replyList", replyList);
+		return "board/detail";
+	}
+	
 }
