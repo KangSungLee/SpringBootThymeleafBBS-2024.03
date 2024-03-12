@@ -68,7 +68,7 @@ public class FileController {
 //		return null;
 //	}
 	
-	@GetMapping("/download/{dir}/{filename}", "/profile/{filename}")
+	@GetMapping("/download/{dir}/{filename}")
 	public ResponseEntity<Resource> download(@PathVariable String dir, @PathVariable String filename){
 	Path path = Paths.get(uploadDir + dir + "/" + filename);
 	try {
@@ -88,32 +88,32 @@ public class FileController {
 	return null;
 	}
 	
-	@GetMapping("/download/{dir}/{filename}")
-	public ResponseEntity<Resource> getFile(@PathVariable String type, @PathVariable String filename) {
-	    String dir = null;
-	    if (type.equals("profile")) {
-	        dir = "profile/";
-	    } else if (type.equals("download")) {
-	        dir = "image/";
-	    }
-	    
-	    Path path = Paths.get(uploadDir + dir + filename);
-	    try {
-	        String contentType = Files.probeContentType(path);
-	        HttpHeaders headers = new HttpHeaders();
-	        headers.setContentDisposition(
-	                ContentDisposition.builder("attachment")
-	                        .filename(filename, StandardCharsets.UTF_8)
-	                        .build()
-	        );
-	        headers.add(HttpHeaders.CONTENT_TYPE, contentType);
-	        Resource resource = new InputStreamResource(Files.newInputStream(path));
-	        return new ResponseEntity<>(resource, headers, HttpStatus.OK);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return null;
-	}
+//	@GetMapping(value = {"/download/{dir}/{filename}", "/profile/{filename}"})
+//	public ResponseEntity<Resource> getFile(@PathVariable String type, @PathVariable String filename) {
+//	    String dir = null;
+//	    if (type.equals("profile")) {
+//	        dir = "profile/";
+//	    } else if (type.equals("download")) {
+//	        dir = "image/";
+//	    }
+//	    
+//	    Path path = Paths.get(uploadDir + dir + filename);
+//	    try {
+//	        String contentType = Files.probeContentType(path);
+//	        HttpHeaders headers = new HttpHeaders();
+//	        headers.setContentDisposition(
+//	                ContentDisposition.builder("attachment")
+//	                        .filename(filename, StandardCharsets.UTF_8)
+//	                        .build()
+//	        );
+//	        headers.add(HttpHeaders.CONTENT_TYPE, contentType);
+//	        Resource resource = new InputStreamResource(Files.newInputStream(path));
+//	        return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	    }
+//	    return null;
+//	}
 	
 	@ResponseBody
 	@PostMapping("/imageUpload")
