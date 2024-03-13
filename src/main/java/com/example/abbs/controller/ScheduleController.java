@@ -96,7 +96,7 @@ public class ScheduleController {
 				calendar.add(week);
 		}
 		
-		// 다음 달 1일부터 그주 토요일까지
+		// 다음 달 1일부터 그 주 토요일까지
 		if (lastDate != 6) {
 			LocalDate nextDay = lastDay.plusDays(1);
 			int nextMonth = nextDay.getMonthValue();
