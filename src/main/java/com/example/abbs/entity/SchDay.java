@@ -24,11 +24,6 @@ public class SchDay {
 		this.schedList = schedList;
 	}
 	
-	@Override
-	public String toString() {
-		return "SchDay [day=" + day + ", date=" + date + ", isHoliday=" + isHoliday + ", isOtherMonth=" + isOtherMonth
-				+ ", sdate=" + sdate + ", annivList=" + annivList + ", schedList=" + schedList + "]";
-	}
 	public int getDay() {
 		return day;
 	}

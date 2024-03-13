@@ -41,8 +41,9 @@
 						</tr>
 						<tr th:each="week: ${calendar}">
 							<div th:each="day: ${week}">
-								<td>
-
+								<td th:style="|height: ${height}px|">
+									[[${day.day}]]<br>
+									[[${day.sdate}]]
 								</td>
 							</div>
 						</tr>
