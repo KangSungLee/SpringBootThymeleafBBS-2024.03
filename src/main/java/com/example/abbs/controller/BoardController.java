@@ -2,7 +2,9 @@ package com.example.abbs.controller;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -115,6 +117,13 @@ public class BoardController {
 			model.addAttribute("fileList", fileList);
 		}
 		model.addAttribute("board", board);
+		
+		// 좋아요 처리
+		Like like = likeService.getLike(sessUid, bid);
+		if (like == null)
+			session.setAttribute("likeClicked", 0);
+		else
+			session.setAttribute("likeClicked", like.getValue());
 		model.addAttribute("count", board.getLikeCount());
 		
 		List<Reply> replyList = replyService.getReplyList(bid);
@@ -138,18 +147,20 @@ public class BoardController {
 		return "redirect:/board/detail/" + bid + "/" + uid + "?option=DNI";
 	}
 	
-	// AJAX 처리
+	// AJAX 처리 - 타임리프에서 세팅하는 값을 변경하기 위한 방법
 	@GetMapping("/like/{bid}")
 	public String like(@PathVariable int bid, HttpSession session, Model model){
 		String sessUid = (String) session.getAttribute("sessUid");
 		Like like = likeService.getLike(sessUid, bid);
 		if (like == null) {
 			likeService.insertLike(new Like(sessUid, bid, 1));
+			session.setAttribute("likeClicked", 1);
 		} else {
-			likeService.toggleLike(like);
+			int value = likeService.toggleLike(like);
+			session.setAttribute("likeClicked", value);
 		}
 		int count = likeService.getLikeCount(bid);
-//		boardService. board.likeCount update!!!
+		boardService.updateLikeCount(bid, count);
 		model.addAttribute("count", count);
 		return "board/detail::#likeCount"; 
 	}
