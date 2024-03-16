@@ -168,4 +168,10 @@ public class BoardController {
 		model.addAttribute("count", count);
 		return "board/detail::#likeCount"; 
 	}
+	
+	//
+	
+	
+	
+	//
 }
